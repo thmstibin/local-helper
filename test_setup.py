@@ -21,6 +21,7 @@ def test_dependencies():
         'anthropic',
         'rich',
         'pydantic',
+        'pydantic_settings',
         'dotenv',
         'PyPDF2',
         'openpyxl',
@@ -43,25 +44,31 @@ def test_dependencies():
 
     return all_installed
 
-def test_env_file():
-    """Check if .env file exists."""
+def test_configuration():
+    """Check if configuration is set up."""
     print("\n⚙️  Checking configuration...")
-    env_file = Path('.env')
+    import os
 
+    # Check if API key is in environment
+    if os.getenv('ANTHROPIC_API_KEY') and os.getenv('ANTHROPIC_API_KEY') != 'your_api_key_here':
+        print("   ✅ API key configured in environment")
+        return True
+
+    env_file = Path('.env')
     if env_file.exists():
         print("   ✅ .env file exists")
 
-        # Check for API key
+        # Check for API key in .env
         with open(env_file) as f:
             content = f.read()
             if 'ANTHROPIC_API_KEY' in content and 'your_api_key_here' not in content:
-                print("   ✅ API key configured")
+                print("   ✅ API key configured in .env")
                 return True
             else:
                 print("   ⚠️  API key not configured (edit .env)")
                 return False
     else:
-        print("   ❌ .env file not found")
+        print("   ❌ .env file not found and ANTHROPIC_API_KEY not in environment")
         print("      Run: cp .env.example .env")
         return False
 
@@ -131,7 +138,7 @@ def main():
 
     results.append(("Python Version", test_python_version()))
     results.append(("Dependencies", test_dependencies()))
-    results.append(("Configuration", test_env_file()))
+    results.append(("Configuration", test_configuration()))
     results.append(("Workspace", test_workspace()))
     results.append(("Modules", test_imports()))
 
